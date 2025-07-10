@@ -68,3 +68,29 @@ with engine.connect() as connection:
         else:
             print("Aucun client trouvé dont le nom commence par 'S'.")
 
+# Afficher les plats avec leur nom de catégorie
+with engine.connect() as connection:
+        query = text("""
+            SELECT
+                p.nom AS nom_plat,
+                p.prix,
+                p.description,
+                c.nom AS nom_categorie
+            FROM
+                plats AS p
+            JOIN
+                categories AS c ON p.categorie_id = c.id
+            ORDER BY
+                p.nom; -- Tri par nom de plat pour une meilleure lisibilité
+        """)
+
+        # --- 4. Exécution de la requête et chargement des résultats dans un DataFrame pandas ---
+        df_plats_categories = pd.read_sql_query(query, connection)
+
+        print("\nListe des plats avec leur nom de catégorie :")
+        if not df_plats_categories.empty:
+            print(df_plats_categories.to_string(index=False))
+        else:
+            print("Aucun plat trouvé.")
+
+

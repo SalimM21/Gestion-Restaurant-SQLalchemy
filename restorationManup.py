@@ -46,4 +46,25 @@ with engine.connect() as connection:
     else:
         print("Aucun plat trouvé dans cette fourchette de prix.")
 
+# Afficher les clients dont le nom commence par "S"
+with engine.connect() as connection:
+        query = text("""
+            SELECT
+                id,
+                nom,
+                email
+            FROM
+                clients
+            WHERE
+                nom LIKE 'S%';
+        """)
+
+        # --- Exécution de la requête et chargement des résultats dans un DataFrame pandas ---
+        df_clients_filtres = pd.read_sql_query(query, connection)
+
+        print("\nListe des clients dont le nom commence par 'S' :")
+        if not df_clients_filtres.empty:
+            print(df_clients_filtres.to_string(index=False))
+        else:
+            print("Aucun client trouvé dont le nom commence par 'S'.")
 

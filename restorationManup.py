@@ -117,3 +117,33 @@ with engine.connect() as connection:
             print(df_commandes_clients.to_string(index=False)) 
         else:
             print("Aucune commande trouvée.")
+
+# Pour chaque commande, afficher les plats commandés avec leur quantité
+with engine.connect() as connection:
+        query = text("""
+            SELECT
+                co.id AS commande_id,
+                cl.nom AS nom_client,
+                co.date_commande,
+                p.nom AS nom_plat,
+                cp.quantite,
+                p.prix AS prix_unitaire,
+                (cp.quantite * p.prix) AS sous_total_plat
+            FROM
+                commandes AS co
+            JOIN
+                clients AS cl ON co.client_id = cl.id
+            JOIN
+                commande_plats AS cp ON co.id = cp.commande_id
+            JOIN
+                plats AS p ON cp.plat_id = p.id
+            ORDER BY
+                co.id, p.nom; -- Tri par ID de commande, puis par nom de plat
+        """)
+        df_commande_details = pd.read_sql_query(query, connection)
+
+        print("\nDétails de chaque commande (plats commandés et leur quantité) :")
+        if not df_commande_details.empty:
+            print(df_commande_details.to_string(index=False))
+        else:
+            print("Aucun détail de commande trouvé.")

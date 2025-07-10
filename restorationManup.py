@@ -93,4 +93,27 @@ with engine.connect() as connection:
         else:
             print("Aucun plat trouvé.")
 
+# Lister les commandes avec le nom du client et la date
+print("Tentative de connexion à la base de données et de récupération des commandes avec le nom du client et la date...")
+with engine.connect() as connection:
+        query = text("""
+            SELECT
+                co.id AS commande_id,
+                cl.nom AS nom_client,
+                co.date_commande,
+                co.total
+            FROM
+                commandes AS co
+            JOIN
+                clients AS cl ON co.client_id = cl.id
+            ORDER BY
+                co.date_commande DESC; -- Tri par date de commande décroissante
+        """)
 
+        df_commandes_clients = pd.read_sql_query(query, connection)
+
+        print("\nListe des commandes avec le nom du client et la date :")
+        if not df_commandes_clients.empty:
+            print(df_commandes_clients.to_string(index=False)) 
+        else:
+            print("Aucune commande trouvée.")

@@ -147,3 +147,26 @@ with engine.connect() as connection:
             print(df_commande_details.to_string(index=False))
         else:
             print("Aucun détail de commande trouvé.")
+
+# Afficher le nombre de plats pour chaque catégorie
+with engine.connect() as connection:
+        query = text("""
+            SELECT
+                c.nom AS nom_categorie,
+                AVG(p.prix) AS prix_moyen
+            FROM
+                categories AS c
+            JOIN
+                plats AS p ON c.id = p.categorie_id
+            GROUP BY
+                c.nom
+            ORDER BY
+                prix_moyen DESC; -- Tri par prix moyen décroissant
+        """)
+        df_prix_moyen_par_categorie = pd.read_sql_query(query, connection)
+
+        print("\nPrix moyen des plats pour chaque catégorie :")
+        if not df_prix_moyen_par_categorie.empty:
+            print(df_prix_moyen_par_categorie.to_string(index=False))
+        else:
+            print("Aucun plat ou catégorie trouvé pour calculer le prix moyen.")

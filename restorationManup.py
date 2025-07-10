@@ -170,3 +170,30 @@ with engine.connect() as connection:
             print(df_prix_moyen_par_categorie.to_string(index=False))
         else:
             print("Aucun plat ou catégorie trouvé pour calculer le prix moyen.")
+
+# le prix moyen des plats par catégorie
+# Afficher le nombre de commandes par client
+with engine.connect() as connection:
+        query = text("""
+            SELECT
+                cl.nom AS nom_client,
+                COUNT(co.id) AS nombre_de_commandes
+            FROM
+                clients AS cl
+            JOIN
+                commandes AS co ON cl.id = co.client_id
+            GROUP BY
+                cl.nom
+            HAVING
+                COUNT(co.id) > 1
+            ORDER BY
+                nombre_de_commandes DESC; -- Tri par nombre de commandes décroissant
+        """)
+
+        df_clients_plus_une_commande = pd.read_sql_query(query, connection)
+
+        print("\nClients ayant passé plus d'une commande :")
+        if not df_clients_plus_une_commande.empty:
+            print(df_clients_plus_une_commande.to_string(index=False)) 
+        else:
+            print("Aucun client n'a passé plus d'une commande.")
